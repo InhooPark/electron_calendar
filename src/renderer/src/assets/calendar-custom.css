@@ -1,0 +1,48 @@
+/* src/renderer/src/assets/calendar-custom.css */
+
+/* 전체 폰트 크기 조절 */
+.fc {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.fc-view-harness {
+  flex-grow: 1;
+  background-color: #fff;
+}
+.fc-scroller {
+  overflow-y: auto !important;
+}
+
+/* 툴바(제목, 버튼) 스타일 */
+.fc-toolbar-title {
+  font-size: 1.5rem !important;
+  font-weight: bold;
+  color: #333;
+}
+
+/* 오늘 날짜 배경색 변경 (포인트 컬러) */
+.fc-day-today {
+  background-color: rgba(66, 165, 245, 0.1) !important;
+}
+
+/* 달력 그리드 선을 연하게 */
+.fc-theme-standard td,
+.fc-theme-standard th {
+  border-color: #f0f0f0;
+}
+
+/* 이벤트(일정) 스타일 */
+.fc-event {
+  cursor: pointer;
+  background-color: #3788d8;
+  border: none;
+  padding: 2px 4px;
+}
+
+.selected-date-cell {
+  position: relative;
+  box-shadow: inset 0 0 0 3px #ff4d4d !important;
+  background-color: rgba(255, 77, 77, 0.05) !important;
+}

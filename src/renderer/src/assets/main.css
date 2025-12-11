@@ -1,0 +1,121 @@
+/* main.css */
+
+/* 1. 기본 초기화: 여백 제거 및 박스 모델 설정 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 2. 앱 전체 높이 설정 (스크롤바 없이 꽉 차게) */
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden; /* 불필요한 스크롤 방지 */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* 3. 전체 레이아웃 컨테이너 */
+.app-container {
+  display: grid;
+  grid-template-columns: 7fr 3fr; /* 핵심: 좌우 7:3 분할 */
+  height: 100vh;
+  width: 100vw;
+  background-color: #f5f5f5;
+  position: relative;
+}
+
+/* 4. 좌측 패널 (달력 영역) */
+.left-panel {
+  background-color: #ffffff;
+  border-right: 1px solid #e0e0e0; /* 구분선 */
+  display: flex;
+  flex-direction: column;
+  padding: 60px 20px 20px 20px;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+/* 5. 우측 패널 (투두 + 뮤직) */
+.right-panel {
+  display: flex;
+  flex-direction: column; /* 위아래로 배치 */
+  height: 100%;
+  background-color: #fafafa;
+  padding-top: 60px;
+}
+
+/* 우측 상단: 투두리스트 (남는 공간 모두 차지) */
+.todo-section {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* 우측 하단: 뮤직 플레이어 (고정 높이) */
+.music-section {
+  height: 180px; /* 대략적인 플레이어 높이 */
+  padding: 20px;
+  background-color: #222; /* 플레이어 느낌을 위해 어둡게 */
+  color: white;
+  border-top: 1px solid #ddd;
+}
+
+/* ... 기존 코드 아래에 추가 ... */
+
+/* 창 이동을 위한 손잡이 바 (Header) */
+.drag-handle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  /* justify-content: flex-end; */
+  padding: 0 20px;
+  z-index: 9999;
+  background-color: transparent; /* 평소엔 투명 */
+}
+
+/* 잠금 해제 상태일 때만 드래그 가능하고 배경색 표시 */
+.drag-handle.unlocked {
+  -webkit-app-region: drag; /* 핵심: 이 영역을 잡고 창 이동 가능 */
+  background-color: rgba(200, 200, 200, 0.5); /* 이동 가능함을 시각적으로 표시 */
+}
+
+/* 버튼들은 드래그가 안 되게 예외 처리 (안 그러면 클릭 불가) */
+.drag-handle button,
+.setting-btn {
+  -webkit-app-region: no-drag;
+  cursor: pointer;
+}
+
+/* 설정 버튼 스타일 */
+.setting-btn {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  opacity: 0.5;
+  transition: 0.3s;
+}
+.setting-btn:hover {
+  opacity: 1;
+}
+
+/* 설정 팝업 메뉴 */
+.setting-menu {
+  position: absolute;
+  top: 35px;
+  /* left: 10px; */
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10000;
+  min-width: 200px;
+}
