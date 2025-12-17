@@ -1,32 +1,48 @@
-appId: com.electron.app
-productName: my-calendar
+appId: com.kestrel.mydeskwidget
+productName: My Desk Widget
 directories:
-  buildResources: build
+  output: dist
+  buildResources: resources # 아이콘 파일들이 있는 폴더 이름 (보통 resources)
+
 files:
   - '!**/.vscode/*'
   - '!src/*'
   - '!electron.vite.config.{js,ts,mjs,cjs}'
   - '!{.eslintcache,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
+
 asarUnpack:
   - resources/**
+
 win:
-  executableName: my-calendar
+  executableName: my-desk-widget
+  icon: resources/icon.ico # 윈도우용 아이콘 경로
+  target: nsis
+
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
+  oneClick: false # 설치 과정을 보여줌 (선호도에 따라 true로 변경 가능)
+  perMachine: false # 사용자 계정에만 설치 (true면 모든 사용자)
+
 mac:
+  icon: resources/icon.icns # 맥용 아이콘 경로
+  target:
+    - dmg
+    - zip
   entitlementsInherit: build/entitlements.mac.plist
+  # 캘린더 앱에 불필요한 카메라/마이크 권한 요청 삭제
+  # AppleScript(뮤직 제어)를 위한 설명 추가 (앱 심사 시 필요할 수 있음)
   extendInfo:
-    - NSCameraUsageDescription: Application requests access to the device's camera.
-    - NSMicrophoneUsageDescription: Application requests access to the device's microphone.
-    - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
-    - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
+    NSAppleEventsUsageDescription: 'This app requires access to control media players.'
   notarize: false
+
 dmg:
   artifactName: ${name}-${version}.${ext}
+  title: '${productName} Installer'
+
 linux:
   target:
     - AppImage
@@ -34,9 +50,13 @@ linux:
     - deb
   maintainer: electronjs.org
   category: Utility
+
 appImage:
   artifactName: ${name}-${version}.${ext}
+
 npmRebuild: false
-publish:
-  provider: generic
-  url: https://example.com/auto-updates
+
+# 아직 자동 업데이트 서버가 없다면 에러가 날 수 있으므로 주석 처리하거나 삭제
+# publish:
+#   provider: generic
+#   url: https://example.com/auto-updates
