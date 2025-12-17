@@ -2,14 +2,11 @@ import React, { useRef, useState } from 'react'
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
-// [중요] CSS 파일이 잘 연결되어 있어야 합니다.
 import '../assets/calendar-custom.css'
 
 export default function CalendarView({ onDateSelect, selectedDate, dailyTodos }) {
   const calendarRef = useRef(null)
   const lastClickTimeRef = useRef(0)
-
-  // 현재 선택된 달 (기본값: 오늘)
   const [activeMonthIndex, setActiveMonthIndex] = useState(new Date().getMonth())
 
   const months = [
@@ -27,7 +24,6 @@ export default function CalendarView({ onDateSelect, selectedDate, dailyTodos })
     'December'
   ]
 
-  // 투두리스트 데이터를 달력 이벤트로 변환
   const calendarEvents = Object.keys(dailyTodos || {}).flatMap((dateKey) =>
     dailyTodos[dateKey].map((todo) => ({
       title: todo.text,
@@ -39,7 +35,7 @@ export default function CalendarView({ onDateSelect, selectedDate, dailyTodos })
   )
 
   const handleMonthClick = (monthIndex) => {
-    setActiveMonthIndex(monthIndex) // 클릭 시 해당 월 활성화(붉은 테두리용)
+    setActiveMonthIndex(monthIndex)
 
     const calendarApi = calendarRef.current.getApi()
     const now = new Date()
@@ -82,7 +78,6 @@ export default function CalendarView({ onDateSelect, selectedDate, dailyTodos })
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%' }}>
-      {/* 1. 상단 미니 이어(Year) 뷰 */}
       <div
         style={{
           display: 'grid',
@@ -99,7 +94,6 @@ export default function CalendarView({ onDateSelect, selectedDate, dailyTodos })
             <div
               key={index}
               onClick={() => handleMonthClick(index)}
-              /* [수정] CSS 클래스로 디자인 제어 (인라인 스타일 제거됨) */
               className={`month-btn ${isActive ? 'active' : ''}`}
             >
               {month}
@@ -108,7 +102,6 @@ export default function CalendarView({ onDateSelect, selectedDate, dailyTodos })
         })}
       </div>
 
-      {/* 2. 메인 달력 */}
       <div style={{ flex: 1, height: '100%', overflow: 'hidden' }}>
         <FullCalendar
           ref={calendarRef}

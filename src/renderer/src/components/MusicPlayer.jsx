@@ -94,26 +94,19 @@ export default function MusicPlayer() {
         </button>
       </div>
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '20px' }}>
-        {/* 이전 곡 */}
         <button onClick={() => handleControl('prev')} style={btnStyle}>
           ⏮
         </button>
-
-        {/* 재생/일시정지 (가장 크게) */}
         <button
           onClick={() => handleControl('play-pause')}
           style={{ ...btnStyle, fontSize: '2rem', color: isPlaying ? '#4caf50' : 'white' }}
         >
           {isPlaying ? '⏸' : '▶'}
         </button>
-
-        {/* 다음 곡 */}
         <button onClick={() => handleControl('next')} style={btnStyle}>
           ⏭
         </button>
       </div>
-
-      {/* 하단: 볼륨 컨트롤 */}
       <div style={{ display: 'flex', justifyContent: 'center', gap: '15px' }}>
         <button onClick={() => handleControl('vol-down')} style={subBtnStyle}>
           🔉 -

@@ -19,13 +19,11 @@ export default function TodoSection({
   const [inputType, setInputType] = useState('daily')
   const [routineDays, setRoutineDays] = useState([0, 1, 2, 3, 4, 5, 6])
 
-  // [추가] 수정 모드 관리를 위한 상태
-  const [editingId, setEditingId] = useState(null) // 현재 수정 중인 항목 ID
-  const [editText, setEditText] = useState('') // 수정 중인 텍스트
+  const [editingId, setEditingId] = useState(null)
+  const [editText, setEditText] = useState('')
 
   const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
-  // === 초기 로드 ===
   // useEffect(() => {
   //   async function loadData() {
   //     if (window.api) {
@@ -41,14 +39,12 @@ export default function TodoSection({
   //   loadData()
   // }, [])
 
-  // // === 데이터 저장 ===
   // useEffect(() => {
   //   if (!isLoaded) return
   //   const dataToSave = { daily: dailyTodos, routines: routines, history: history }
   //   if (window.api) window.api.saveTodos(dataToSave)
   // }, [dailyTodos, routines, history, isLoaded])
 
-  // // === 핸들러 ===
   // const toggleDay = (dayIndex) => {
   //   setRoutineDays((prev) => {
   //     if (prev.includes(dayIndex)) return prev.filter((d) => d !== dayIndex)
@@ -74,7 +70,7 @@ export default function TodoSection({
       }))
     } else {
       if (routineDays.length === 0) {
-        alert('최소 한 개 이상의 요일을 선택해주세요.')
+        alert('Please select at least one day of the week.')
         return
       }
       const newRoutine = { id: Date.now(), text: inputText, days: routineDays, type: 'routine' }
@@ -102,9 +98,8 @@ export default function TodoSection({
     }
   }
 
-  // === [추가] 삭제 핸들러 ===
   const handleDelete = (todo) => {
-    if (!confirm('정말 삭제하시겠습니까?')) return
+    if (!confirm('Delete it?')) return
 
     if (todo.type === 'daily') {
       setDailyTodos((prev) => ({
@@ -112,18 +107,14 @@ export default function TodoSection({
         [selectedDate]: prev[selectedDate].filter((t) => t.id !== todo.id)
       }))
     } else {
-      // 루틴은 전역에서 삭제
       setRoutines((prev) => prev.filter((r) => r.id !== todo.id))
     }
   }
 
-  // === [추가] 수정 시작 핸들러 ===
   const startEditing = (todo) => {
     setEditingId(todo.id)
     setEditText(todo.text)
   }
-
-  // === [추가] 수정 저장 핸들러 ===
   const saveEdit = (todo) => {
     if (!editText.trim()) return
 
@@ -137,16 +128,12 @@ export default function TodoSection({
     } else {
       setRoutines((prev) => prev.map((r) => (r.id === todo.id ? { ...r, text: editText } : r)))
     }
-    setEditingId(null) // 수정 모드 종료
+    setEditingId(null)
   }
-
-  // === [추가] 수정 취소 핸들러 ===
   const cancelEdit = () => {
     setEditingId(null)
     setEditText('')
   }
-
-  // === 필터링 ===
   const currentDailyTodos = dailyTodos[selectedDate] || []
   const currentDayOfWeek = new Date(selectedDate).getDay()
   const currentRoutines = routines.filter((r) => r.days.includes(currentDayOfWeek))
@@ -162,7 +149,6 @@ export default function TodoSection({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '20px' }}>
-      {/* 제목 및 달성률 */}
       <h2 style={{ marginBottom: '10px' }}>
         📅 {selectedDate} <span style={{ fontSize: '0.6em', color: '#888' }}>To-do</span>
       </h2>
@@ -199,8 +185,6 @@ export default function TodoSection({
           />
         </div>
       </div>
-
-      {/* 할 일 목록 */}
       <div style={{ flex: 1, overflowY: 'auto', marginBottom: '15px' }}>
         {displayList.length === 0 ? (
           <p style={{ color: '#ccc', textAlign: 'center', marginTop: '20px' }}>
@@ -208,7 +192,6 @@ export default function TodoSection({
           </p>
         ) : (
           displayList.map((todo, idx) => {
-            // [추가] 현재 항목이 수정 모드인지 확인
             const isEditing = editingId === todo.id
 
             return (
@@ -224,7 +207,6 @@ export default function TodoSection({
                   boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
                 }}
               >
-                {/* 1. 수정 모드일 때 화면 구성 */}
                 {isEditing ? (
                   <div style={{ display: 'flex', flex: 1, gap: '5px' }}>
                     <input
@@ -257,7 +239,6 @@ export default function TodoSection({
                     </button>
                   </div>
                 ) : (
-                  /* 2. 일반 보기 모드 화면 구성 */
                   <>
                     <input
                       type="checkbox"
@@ -277,13 +258,12 @@ export default function TodoSection({
                         color: todo.done ? '#bbb' : '#333',
                         cursor: 'pointer'
                       }}
-                      onDoubleClick={() => startEditing(todo)} // 더블 클릭 시 수정 모드 진입
+                      onDoubleClick={() => startEditing(todo)}
                       title="더블 클릭하여 수정"
                     >
                       {todo.text}
                     </span>
 
-                    {/* 우측 아이콘 그룹 */}
                     <div style={{ display: 'flex', gap: '5px', marginLeft: '10px' }}>
                       <span
                         style={{
@@ -297,7 +277,6 @@ export default function TodoSection({
                         {todo.type === 'routine' ? 'R' : 'D'}
                       </span>
 
-                      {/* 수정 버튼 */}
                       <button
                         onClick={() => startEditing(todo)}
                         style={{
@@ -311,7 +290,6 @@ export default function TodoSection({
                         ✏️
                       </button>
 
-                      {/* 삭제 버튼 */}
                       <button
                         onClick={() => handleDelete(todo)}
                         style={{
@@ -333,7 +311,6 @@ export default function TodoSection({
         )}
       </div>
 
-      {/* 입력 영역 (기존과 동일) */}
       <div style={{ borderTop: '1px solid #eee', paddingTop: '15px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
           <select

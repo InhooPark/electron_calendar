@@ -1,21 +1,15 @@
-/* src/renderer/src/assets/calendar-custom.css */
-
-/* === 1. 달력 전체 기본 설정 === */
 .fc {
   width: 100%;
   height: 100%;
   font-size: 0.9rem;
   color: #e0e0e0;
 
-  /* 달력 내부 변수 재정의 (배경 투명화) */
   --fc-page-bg-color: transparent;
   --fc-neutral-bg-color: transparent;
   --fc-list-event-hover-bg-color: rgba(255, 255, 255, 0.1);
   --fc-today-bg-color: rgba(255, 255, 255, 0.05);
   --fc-border-color: rgba(255, 255, 255, 0.1);
 }
-
-/* === 2. 툴바 (제목 및 버튼) === */
 .fc-toolbar-title {
   font-size: 1.5rem !important;
   font-weight: 700;
@@ -23,8 +17,6 @@
   margin-left: 10px !important;
   margin-right: 10px !important;
 }
-
-/* 네비게이션 버튼 (유리 효과) */
 .fc-button {
   background-color: rgba(255, 255, 255, 0.1) !important;
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
@@ -42,8 +34,6 @@
 .fc-button:disabled {
   opacity: 0.3 !important;
 }
-
-/* 이전/다음 화살표 버튼 */
 .fc-prev-button,
 .fc-next-button {
   width: 35px !important;
@@ -56,8 +46,6 @@
   line-height: 1 !important;
   font-size: 1.2rem !important;
 }
-
-/* === 3. 월 선택 버튼 (상단 12개 버튼) === */
 .month-btn {
   padding: 8px 0;
   text-align: center;
@@ -67,7 +55,6 @@
   cursor: pointer;
   transition: all 0.2s ease;
 
-  /* 기본 상태 */
   background-color: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: #bbb;
@@ -78,8 +65,6 @@
   border-color: rgba(255, 255, 255, 0.3);
   color: #fff;
 }
-
-/* 선택된 상태 (Active) - 붉은 테두리 */
 .month-btn.active {
   background-color: rgba(255, 77, 77, 0.1);
   border: 1px solid #ff4d4d;
@@ -88,7 +73,6 @@
   box-shadow: 0 0 8px rgba(255, 77, 77, 0.3);
 }
 
-/* === 4. 그리드(표) 스타일 === */
 .fc-theme-standard td,
 .fc-theme-standard th,
 .fc-scrollgrid {
@@ -118,7 +102,6 @@
   background-color: rgba(255, 107, 107, 0.1) !important;
 }
 
-/* === 5. 이벤트(일정 바) 스타일 === */
 .fc-daygrid-event {
   background-color: rgba(255, 77, 77, 0.3) !important;
   border: none !important;
@@ -140,7 +123,6 @@
   border-radius: 4px;
 }
 
-/* === 6. 스크롤바 제거 === */
 .fc-scroller {
   overflow-y: hidden !important;
 }
