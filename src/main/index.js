@@ -4,6 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import fs from 'fs'
 import path from 'path'
+import { exec } from 'child_process'
 
 const DATA_PATH = path.join(app.getPath('userData'), 'todo-data.json')
 
@@ -29,6 +30,98 @@ ipcMain.handle('save-todos', async (event, data) => {
     console.error('Failed to save todos:', err)
     return false
   }
+})
+// media key control
+ipcMain.handle('media-control', async (event, action) => {
+  // Windows or macOS
+  const isWin = process.platform === 'win32'
+  let command = ''
+
+  if (isWin) {
+    // Windows
+    // 179: play/pause, 178: stop, 177: prev, 176: next
+    // 175: volup, 174: voldown, 173: mute
+    let keyCode = 0
+    switch (action) {
+      case 'play-pause':
+        keyCode = 179
+        break
+      case 'next':
+        keyCode = 176
+        break
+      case 'prev':
+        keyCode = 177
+        break
+      case 'vol-up':
+        keyCode = 175
+        break
+      case 'vol-down':
+        keyCode = 174
+        break
+      case 'mute':
+        keyCode = 173
+        break
+    }
+    if (keyCode > 0) {
+      command = `powershell -c "$wshell = New-Object -ComObject WScript.Shell; $wShell.SendKeys([char]${keyCode})"`
+    }
+  } else {
+    // macOS
+    // 100: play/pause, 101: prev, 98: next,
+    const targetApp = 'Spotify'
+    let script = ''
+    switch (action) {
+      // playpause: 재생/일시정지 토글
+      case 'play-pause':
+        script = `tell application "${targetApp}" to playpause`
+        break
+
+      // 트랙 이동
+      case 'next':
+        script = `tell application "${targetApp}" to next track`
+        break
+      case 'prev':
+        script = `tell application "${targetApp}" to previous track`
+        break
+
+      // 볼륨 조절 (시스템 전체 볼륨)
+      case 'vol-up':
+        script = 'set volume output volume (output volume of (get volume settings) + 10)'
+        break
+      case 'vol-down':
+        script = 'set volume output volume (output volume of (get volume settings) - 10)'
+        break
+      case 'mute':
+        script = 'set volume output muted not (output muted of (get volume settings))'
+        break
+    }
+    if (script) {
+      command = `osascript -e '${script}'`
+    }
+  }
+  if (command) {
+    exec(command, (error) => {
+      if (error) console.error(`Media control failed: ${error}`)
+    })
+  }
+})
+// Media App Power
+ipcMain.handle('app-control', async (event, { action, appName }) => {
+  const isWin = process.platform === 'win32'
+  let command = ''
+
+  // Windows exeName(Spotify), macOS appName(Spotify)
+  const targetApp = appName || (isWin ? 'Spotify' : 'Spotify')
+  if (action === 'open') {
+    if (isWin) command = `start "" "${targetApp}"`
+    else command = `open -a "${targetApp}"`
+  } else if (action === 'close') {
+    if (isWin) command = `taskkill /IM "${targetApp}.exe" /F`
+    else command = `killall "${targetApp}"`
+  }
+  exec(command, (error) => {
+    if (error) console.error(`App control failed: ${error}`)
+  })
 })
 
 function createWindow() {

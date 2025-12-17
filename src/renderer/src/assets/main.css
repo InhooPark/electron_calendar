@@ -57,11 +57,12 @@ body,
 
 /* 우측 하단: 뮤직 플레이어 (고정 높이) */
 .music-section {
-  height: 180px; /* 대략적인 플레이어 높이 */
-  padding: 20px;
-  background-color: #222; /* 플레이어 느낌을 위해 어둡게 */
+  height: 200px;
+  padding: 0;
+  background-color: #222;
   color: white;
   border-top: 1px solid #ddd;
+  overflow: hidden;
 }
 
 /* ... 기존 코드 아래에 추가 ... */

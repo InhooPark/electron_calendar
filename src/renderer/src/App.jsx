@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import './assets/main.css'
 import CalendarView from './components/CalendarView'
 import TodoSection from './components/TodoSection'
+import MusicPlayer from './components/MusicPlayer'
 
 function App() {
   const [isLocked, setIsLocked] = useState(true)
@@ -66,9 +67,8 @@ function App() {
           <TodoSection selectedDate={selectedDate} />
         </div>
 
-        {/* 이제 여기가 비어있습니다. 곧 뮤직 플레이어를 채울 차례입니다! */}
-        <div className="music-section">
-          <h3>🎵 Music</h3>
+        <div className="music-section" sytle={{ padding: 0 }}>
+          <MusicPlayer />
         </div>
       </div>
     </div>

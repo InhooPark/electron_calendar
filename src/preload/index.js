@@ -3,7 +3,10 @@ import { electronAPI } from '@electron-toolkit/preload'
 
 const api = {
   readTodos: () => ipcRenderer.invoke('read-todos'),
-  saveTodos: (data) => ipcRenderer.invoke('save-todos', data)
+  saveTodos: (data) => ipcRenderer.invoke('save-todos', data),
+
+  mediaControl: (action) => ipcRenderer.invoke('media-control', action),
+  appControl: (action, appName) => ipcRenderer.invoke('app-control', { action, appName })
 }
 
 if (process.contextIsolated) {
