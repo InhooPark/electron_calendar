@@ -1,11 +1,19 @@
 import React, { useState, useEffect } from 'react'
 
-export default function TodoSection({ selectedDate }) {
+export default function TodoSection({
+  selectedDate,
+  dailyTodos,
+  setDailyTodos,
+  routines,
+  setRoutines,
+  history,
+  setHistory
+}) {
   // === 상태 관리 ===
-  const [dailyTodos, setDailyTodos] = useState({})
-  const [routines, setRoutines] = useState([])
-  const [history, setHistory] = useState({})
-  const [isLoaded, setIsLoaded] = useState(false)
+  // const [dailyTodos, setDailyTodos] = useState({})
+  // const [routines, setRoutines] = useState([])
+  // const [history, setHistory] = useState({})
+  // const [isLoaded, setIsLoaded] = useState(false)
 
   const [inputText, setInputText] = useState('')
   const [inputType, setInputType] = useState('daily')
@@ -18,29 +26,36 @@ export default function TodoSection({ selectedDate }) {
   const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
   // === 초기 로드 ===
-  useEffect(() => {
-    async function loadData() {
-      if (window.api) {
-        const data = await window.api.readTodos()
-        if (data) {
-          setDailyTodos(data.daily || {})
-          setRoutines(data.routines || [])
-          setHistory(data.history || {})
-        }
-      }
-      setIsLoaded(true)
-    }
-    loadData()
-  }, [])
+  // useEffect(() => {
+  //   async function loadData() {
+  //     if (window.api) {
+  //       const data = await window.api.readTodos()
+  //       if (data) {
+  //         setDailyTodos(data.daily || {})
+  //         setRoutines(data.routines || [])
+  //         setHistory(data.history || {})
+  //       }
+  //     }
+  //     setIsLoaded(true)
+  //   }
+  //   loadData()
+  // }, [])
 
-  // === 데이터 저장 ===
-  useEffect(() => {
-    if (!isLoaded) return
-    const dataToSave = { daily: dailyTodos, routines: routines, history: history }
-    if (window.api) window.api.saveTodos(dataToSave)
-  }, [dailyTodos, routines, history, isLoaded])
+  // // === 데이터 저장 ===
+  // useEffect(() => {
+  //   if (!isLoaded) return
+  //   const dataToSave = { daily: dailyTodos, routines: routines, history: history }
+  //   if (window.api) window.api.saveTodos(dataToSave)
+  // }, [dailyTodos, routines, history, isLoaded])
 
-  // === 핸들러 ===
+  // // === 핸들러 ===
+  // const toggleDay = (dayIndex) => {
+  //   setRoutineDays((prev) => {
+  //     if (prev.includes(dayIndex)) return prev.filter((d) => d !== dayIndex)
+  //     else return [...prev, dayIndex].sort()
+  //   })
+  // }
+
   const toggleDay = (dayIndex) => {
     setRoutineDays((prev) => {
       if (prev.includes(dayIndex)) return prev.filter((d) => d !== dayIndex)
@@ -149,7 +164,7 @@ export default function TodoSection({ selectedDate }) {
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '20px' }}>
       {/* 제목 및 달성률 */}
       <h2 style={{ marginBottom: '10px' }}>
-        📅 {selectedDate} <span style={{ fontSize: '0.6em', color: '#888' }}>할 일</span>
+        📅 {selectedDate} <span style={{ fontSize: '0.6em', color: '#888' }}>To-do</span>
       </h2>
       <div style={{ marginBottom: '20px' }}>
         <div
@@ -161,7 +176,7 @@ export default function TodoSection({ selectedDate }) {
           }}
         >
           <span>Achievement Rate</span>
-          <span style={{ fontWeight: 'bold', color: progress === 100 ? '#4caf50' : '#333' }}>
+          <span style={{ fontWeight: 'bold', color: progress === 100 ? '#ff4d4d' : '#333' }}>
             {progress}%
           </span>
         </div>
@@ -178,7 +193,7 @@ export default function TodoSection({ selectedDate }) {
             style={{
               width: `${progress}%`,
               height: '100%',
-              background: progress === 100 ? '#4caf50' : '#2196f3',
+              background: progress === 100 ? '#ff4d4d' : '#ff8d8d',
               transition: 'width 0.3s ease'
             }}
           />
@@ -188,7 +203,9 @@ export default function TodoSection({ selectedDate }) {
       {/* 할 일 목록 */}
       <div style={{ flex: 1, overflowY: 'auto', marginBottom: '15px' }}>
         {displayList.length === 0 ? (
-          <p style={{ color: '#ccc', textAlign: 'center', marginTop: '20px' }}>할 일이 없습니다.</p>
+          <p style={{ color: '#ccc', textAlign: 'center', marginTop: '20px' }}>
+            There is nothing to do
+          </p>
         ) : (
           displayList.map((todo, idx) => {
             // [추가] 현재 항목이 수정 모드인지 확인
@@ -369,8 +386,13 @@ export default function TodoSection({ selectedDate }) {
             type="text"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleAddTodo()}
-            placeholder="할 일을 입력하세요..."
+            onKeyDown={(e) => {
+              // e.key === 'Enter' && handleAddTodo()}}
+              if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
+                handleAddTodo()
+              }
+            }}
+            placeholder="What are you doing today?"
             style={{ flex: 1, padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
           />
           <button

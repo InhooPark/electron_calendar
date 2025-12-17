@@ -1,5 +1,5 @@
 // src/renderer/src/App.jsx
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import './assets/main.css'
 import CalendarView from './components/CalendarView'
 import TodoSection from './components/TodoSection'
@@ -20,9 +20,35 @@ function App() {
     return `${year}-${month}-${day}`
   })
 
+  const [dailyTodos, setDailyTodos] = useState({})
+  const [routines, setRoutines] = useState([])
+  const [history, setHistory] = useState({})
+  const [isLoaded, setIsLoaded] = useState(false)
+
+  // init data load
+  useEffect(() => {
+    async function loadData() {
+      if (window.api) {
+        const data = await window.api.readTodos()
+        if (data) {
+          setDailyTodos(data.daily || {})
+          setRoutines(data.routines || [])
+          setHistory(data.history || {})
+        }
+      }
+      setIsLoaded(true)
+    }
+    loadData()
+  }, [])
+  // data auto save
+  useEffect(() => {
+    if (!isLoaded) return
+    const dataToSave = { datily: dailyTodos, routines: routines, history: history }
+    if (window.api) window.api.saveTodos(dataToSave)
+  }, [dailyTodos, routines, history, isLoaded])
+
   return (
     <div className="app-container">
-      {/* 상단 드래그 핸들 & 설정 버튼 */}
       <div
         className={`drag-handle ${!isLocked ? 'unlocked' : ''}`}
         style={{ justifyContent: isWindows ? 'flex-end' : 'flex-start' }}
@@ -47,24 +73,32 @@ function App() {
                 }}
               >
                 <input type="checkbox" checked={isLocked} onChange={() => setIsLocked(!isLocked)} />
-                <span>창 위치 고정하기</span>
+                <span>Pin a window</span>
               </label>
             </div>
           )}
         </div>
       </div>
 
-      {/* 좌측 70%: 달력 영역 */}
       <div className="left-panel">
-        {/* 달력 날짜 클릭 시 selectedDate 변경 */}
-        <CalendarView onDateSelect={(date) => setSelectedDate(date)} selectedDate={selectedDate} />
+        <CalendarView
+          onDateSelect={(date) => setSelectedDate(date)}
+          selectedDate={selectedDate}
+          dailyTodos={dailyTodos}
+        />
       </div>
 
-      {/* 우측 30%: 투두 + 뮤직 */}
       <div className="right-panel">
         <div className="todo-section">
-          {/* 변경된 날짜를 투두 섹션에 전달 */}
-          <TodoSection selectedDate={selectedDate} />
+          <TodoSection
+            selectedDate={selectedDate}
+            dailyTodos={dailyTodos}
+            setDailyTodos={setDailyTodos}
+            routines={routines}
+            setRoutines={setRoutines}
+            history={history}
+            setHistory={setHistory}
+          />
         </div>
 
         <div className="music-section" sytle={{ padding: 0 }}>

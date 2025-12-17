@@ -129,6 +129,13 @@ function createWindow() {
     width: 900,
     height: 670,
     show: false,
+
+    frame: false,
+    transparent: true,
+    // resizable: false,
+    skipTaskbar: true,
+    hasShadow: false,
+
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
@@ -139,6 +146,10 @@ function createWindow() {
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
+    // 윈도우(창)에서 항상 맨 뒤로 보내려고 시도하기
+    // 데스크탑위젯과 같이 폴더, 파일보다 아래로 가려면 electron 자체적으론 어려움
+    // 때문에 바탕화면에 배치하더라도 폴더나 파일과 겹치지 않게 배치해야하는 단점
+    mainWindow.setAlwaysOnTop(false)
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {

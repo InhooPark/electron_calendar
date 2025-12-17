@@ -1,17 +1,17 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
+// [중요] CSS 파일이 잘 연결되어 있어야 합니다.
 import '../assets/calendar-custom.css'
 
-export default function CalendarView({ onDateSelect, selectedDate }) {
+export default function CalendarView({ onDateSelect, selectedDate, dailyTodos }) {
   const calendarRef = useRef(null)
-
-  // [수정 팁] 리렌더링 되어도 값이 유지되도록 useRef 사용 권장 (let 대신)
-  // 기존 코드대로 let을 써도 당장은 동작하지만, useRef가 더 안정적입니다.
   const lastClickTimeRef = useRef(0)
 
-  const currentMonthIndex = new Date().getMonth()
+  // 현재 선택된 달 (기본값: 오늘)
+  const [activeMonthIndex, setActiveMonthIndex] = useState(new Date().getMonth())
+
   const months = [
     'January',
     'February',
@@ -27,28 +27,48 @@ export default function CalendarView({ onDateSelect, selectedDate }) {
     'December'
   ]
 
+  // 투두리스트 데이터를 달력 이벤트로 변환
+  const calendarEvents = Object.keys(dailyTodos || {}).flatMap((dateKey) =>
+    dailyTodos[dateKey].map((todo) => ({
+      title: todo.text,
+      date: dateKey,
+      allDay: true,
+      backgroundColor: todo.done ? '#777' : '#ff4d4d',
+      borderColor: todo.done ? '#777' : '#ff4d4d'
+    }))
+  )
+
   const handleMonthClick = (monthIndex) => {
+    setActiveMonthIndex(monthIndex) // 클릭 시 해당 월 활성화(붉은 테두리용)
+
     const calendarApi = calendarRef.current.getApi()
     const now = new Date()
     const targetDate = new Date(now.getFullYear(), monthIndex, 1)
     calendarApi.gotoDate(targetDate)
   }
+  const handleTodayClick = () => {
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = String(now.getMonth() + 1).padStart(2, '0')
+    const day = String(now.getDate()).padStart(2, '0')
+    const todayStr = `${year}-${month}-${day}`
 
-  // Double Click 구현 로직
+    setActiveMonthIndex(now.getMonth())
+    onDateSelect(todayStr)
+    const calendarApi = calendarRef.current.getApi()
+    calendarApi.today()
+  }
   const handleDateClick = (info) => {
     const currentTime = new Date().getTime()
-    const gap = currentTime - lastClickTimeRef.current // ref 값 사용
-
+    const gap = currentTime - lastClickTimeRef.current
     if (gap < 300) {
-      // 0.3초 이내 클릭 시 (더블 클릭)
       onDateSelect(info.dateStr)
     } else {
-      // (선택 사항) 싱글 클릭 시에도 동작하게 하려면 유지,
-      // 더블 클릭만 원하시면 이 else 블록을 비워두거나 삭제하세요.
       onDateSelect(info.dateStr)
     }
-    lastClickTimeRef.current = currentTime // 시간 업데이트
+    lastClickTimeRef.current = currentTime
   }
+
   const getDayClass = (arg) => {
     const cellDate =
       arg.date.getFullYear() +
@@ -56,21 +76,12 @@ export default function CalendarView({ onDateSelect, selectedDate }) {
       String(arg.date.getMonth() + 1).padStart(2, '0') +
       '-' +
       String(arg.date.getDate()).padStart(2, '0')
-    if (cellDate === selectedDate) {
-      return ['selected-date-cell']
-    }
+    if (cellDate === selectedDate) return ['selected-date-cell']
     return []
   }
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        width: '100%'
-      }}
-    >
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%' }}>
       {/* 1. 상단 미니 이어(Year) 뷰 */}
       <div
         style={{
@@ -82,37 +93,14 @@ export default function CalendarView({ onDateSelect, selectedDate }) {
         }}
       >
         {months.map((month, index) => {
-          const isCurrentMonth = index === currentMonthIndex
+          const isActive = index === activeMonthIndex
 
           return (
             <div
               key={index}
               onClick={() => handleMonthClick(index)}
-              style={{
-                padding: '8px 0',
-                textAlign: 'center',
-                borderRadius: '5px',
-                fontSize: '0.8rem',
-                fontWeight: isCurrentMonth ? 'bold' : '600',
-                cursor: 'pointer',
-                border: '1px solid',
-                borderColor: isCurrentMonth ? '#3788d8' : '#eee',
-                transition: 'all 0.2s',
-                backgroundColor: isCurrentMonth ? '#3788d8' : '#f8f9fa',
-                color: isCurrentMonth ? '#ffffff' : '#555'
-              }}
-              onMouseOver={(e) => {
-                if (!isCurrentMonth) {
-                  e.currentTarget.style.backgroundColor = '#e3f2fd'
-                  e.currentTarget.style.color = '#1976d2'
-                }
-              }}
-              onMouseOut={(e) => {
-                if (!isCurrentMonth) {
-                  e.currentTarget.style.backgroundColor = '#f8f9fa'
-                  e.currentTarget.style.color = '#555'
-                }
-              }}
+              /* [수정] CSS 클래스로 디자인 제어 (인라인 스타일 제거됨) */
+              className={`month-btn ${isActive ? 'active' : ''}`}
             >
               {month}
             </div>
@@ -121,21 +109,28 @@ export default function CalendarView({ onDateSelect, selectedDate }) {
       </div>
 
       {/* 2. 메인 달력 */}
-      <div style={{ flex: 1, overflow: 'hidden' }}>
+      <div style={{ flex: 1, height: '100%', overflow: 'hidden' }}>
         <FullCalendar
           ref={calendarRef}
           plugins={[dayGridPlugin, interactionPlugin]}
           initialView="dayGridMonth"
-          headerToolbar={{
-            left: 'prev',
-            center: 'title',
-            right: 'next'
+          headerToolbar={{ left: 'prev', center: 'myTodayBtn title', right: 'next' }}
+          customButtons={{
+            myTodayBtn: {
+              text: '📅',
+              click: handleTodayClick
+            }
           }}
+          buttonIcons={false}
+          buttonText={{ prev: '‹', next: '›', today: 'Today' }}
           height="100%"
-          contentHeight="auto"
-          /* [핵심 수정] 여기에 handleDateClick을 연결해야 합니다! */
+          expandRows={true}
+          dayMaxEvents={true}
+          handleWindowResize={true}
+          stickyHeaderDates={true}
           dateClick={handleDateClick}
           dayCellClassNames={getDayClass}
+          events={calendarEvents}
         />
       </div>
     </div>
